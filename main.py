@@ -63,14 +63,6 @@ def main():
         (0.5, 0.5),  # back to the middle
         (0.3, 0.1),
     ]
-    # Define the path codes
-    start_codes = [Path.MOVETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.LINETO,
-             Path.CLOSEPOLY,
-             ]
 
     VisualisatorOfTheVector(start_verts)
 
@@ -81,16 +73,18 @@ def main():
 
         print("""Choose the operation:
         1. Rotation
-        2. Left rotation
-        3. Scaling
-        4. Mirroring
-        5. Tilt axes
-        6. Matrix tilt
+        2. Scaling
+        3. Mirroring
+        4. Tilt axes
+        5. Matrix tilt
         """)
         operation = input("Enter the operation number: ")
         match (operation):
             case '1':
-                angle = int(input("Enter the angle of rotation (clockwise): "))
+                anglestr = input("Enter the angle of rotation (clockwise): ")
+                while not anglestr.isdigit():
+                    anglestr = input("Enter the angle of rotation (clockwise): ")
+                angle = float(anglestr)
 
                 # Rotate the vectors
                 new_i_x = i.x * np.cos(np.radians(angle)) - i.y * np.sin(np.radians(angle))
@@ -104,8 +98,19 @@ def main():
                 new_verts = Multiplier(start_verts, i, j)
                 VisualisatorOfTheVector(new_verts)
 
-            # case '2':
-            #
+            case '2':
+                scalestr = input("Enter the scale factor: ")
+                while not scalestr.isdigit():
+                    scalestr = input("Enter the scale factor: ")
+                scale = float(scalestr)
+
+                i.x *= scale
+                i.y *= scale
+                j.x *= scale
+                j.y *= scale
+
+                new_verts = Multiplier(start_verts, i, j)
+                VisualisatorOfTheVector(new_verts)
             # case '3':
             #
             # case '4':
