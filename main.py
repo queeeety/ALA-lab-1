@@ -24,11 +24,18 @@ def VisualisatorOfTheVector(verts):
     y = y + (y[0],)
     # Plot the polygon
     plt.plot(x, y, 'r-')
-    plt.xlim([-2, 2])
-    plt.ylim([-2, 2])
+    maxlimitX = max(x) + 1
+    minlimitX = min(x) - 1
+    maxlimitY = max(y) + 1
+    minlimitY = min(y) - 1
+
+    plt.xlim([minlimitX, maxlimitX])
+    plt.ylim([minlimitY, maxlimitY])
     # Display the figure
     plt.show()
     return 0
+
+
 # def VisualisatorOfTheObject(verts, codes):
 #     # Create a path
 #     path = Path(verts, codes)
@@ -70,22 +77,21 @@ def main():
     ]
     verts2 = [
         (0.0, 0.0),  # left, bottom
-        (0.1, 0.9),  # left, top
-        (0.9, 0.9),  # right, top
-        (0.9, 0.1),  # right, bottom
-        (0.5, 0.5),  # back to the middle
-        (0.3, 0.1),
+        (1.0, 5.0),  # left, top
+        (5.0, 5.0),  # right, top
+        (5.0, 9.0),  # right, bottom
+        (8.0, 7.0),  # back to the middle
+        (10, 3),
     ]
-    # whatFigure = input("Choose the figure (1 - idk, some strange thing, 2 - another strange thing): ")
-    # if whatFigure == '1':
-    #     start_verts = verts1
-    # elif whatFigure == '2':
-    #     start_verts = verts2
-    # else:
-    #     print("Incorrect figure number. I will choose the first one.")
-    #     start_verts = verts1
 
-    start_verts = verts1
+    whatFigure = input("Choose the figure (1 - idk, some strange thing, 2 - another strange thing): ")
+    if whatFigure == '1':
+        start_verts = verts1
+    elif whatFigure == '2':
+        start_verts = verts2
+    else:
+        print("Incorrect figure number. I will choose the first one.")
+        start_verts = verts1
 
     VisualisatorOfTheVector(start_verts)
 
@@ -93,7 +99,6 @@ def main():
     j = Node(0, 1)
     print("The figures are displayed.")
     while True:
-
         print("""Choose the operation:
         1. Rotation
         2. Scaling
@@ -196,9 +201,9 @@ def main():
                     j.x, j.y = b, d
                     new_verts = Multiplier(start_verts, i, j)
                     VisualisatorOfTheVector(new_verts)
-            #
-            # case _:
-            #     print("Incorrect operation number.")
+
+            case _:
+                print("Incorrect operation number.")
 
 
 
