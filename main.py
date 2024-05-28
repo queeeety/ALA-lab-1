@@ -1,10 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.path import Path
+from mpl_toolkits.mplot3d import Axes3D
 from math import cos, sin
-import operations as op
-
+import cv2 as cv
+import time
 
 figure = plt.figure()
 
@@ -16,9 +15,14 @@ class Node:
         self.x = x
         self.y = y
 
+
 def VisualisatorOfTheVector(verts):
     # Unzip the vertices into x and y coordinates
+    # try:
     x, y = zip(*verts)
+    # except ValueError:
+    #     verts = [(vert[0], vert[1]) for vert in verts]
+    #     x, y = zip(*verts)
     # Add the first point to the end to close the polygon
     x = x + (x[0],)
     y = y + (y[0],)
@@ -36,28 +40,6 @@ def VisualisatorOfTheVector(verts):
     return 0
 
 
-# def VisualisatorOfTheObject(verts, codes):
-#     # Create a path
-#     path = Path(verts, codes)
-#     # Create a patch
-#     patch = patches.PathPatch(path, facecolor='red', lw=1)
-#     # Add the patch to the Axes
-#     ax.add_patch(patch)
-#     plt.xlim([-2, 2])
-#     plt.ylim([-2, 2])
-#
-#     # Display the figure
-#     plt.show()
-#     return 0
-#     start_codes = [Path.MOVETO,
-#                    Path.LINETO,
-#                    Path.LINETO,
-#                    Path.LINETO,
-#                    Path.LINETO,
-#                    Path.CLOSEPOLY,
-#                    ]
-
-
 def Multiplier(verts, i, j):
     output = []
     for vert in verts:
@@ -65,8 +47,16 @@ def Multiplier(verts, i, j):
     return output
 
 
+def funcMultiplier(verts, matrix):
+    output = []
+    for vert in verts:
+        output.append((vert[0] * matrix[0][0] + vert[1] * matrix[0][1], vert[0] * matrix[1][0] + vert[1] * matrix[1][1]))
+    return output
+
+
 def main():
     # Define the points of the free-shape object
+    global mirror_matrix, tilt_matrix
     verts1 = [
         (0.0, 0.0),  # left, bottom
         (0.1, 0.9),  # left, top
@@ -105,6 +95,8 @@ def main():
         3. Mirroring
         4. Tilt axes
         5. Custom matrix transformation
+        6. Use external library 
+        7. Image transformationl
         """)
         operation = input("Enter the operation number: ")
         match (operation):
@@ -201,6 +193,110 @@ def main():
                     j.x, j.y = b, d
                     new_verts = Multiplier(start_verts, i, j)
                     VisualisatorOfTheVector(new_verts)
+
+            case '6':
+                verts = start_verts
+                while True:
+                    print("Choose the operation:")
+                    print("1. Rotation")
+                    print("2. Scaling")
+                    print("3. Mirroring")
+                    print("4. Tilt axes")
+                    print("5. Custom matrix transformation")
+                    print("6. Exit")
+                    b = input("Enter the operation number: ")
+                    match b:
+
+                        case "1":
+                            angle = float(input("Enter the angle of rotation (clockwise): "))
+                            rotated_matrix = cv.getRotationMatrix2D((0, 0), angle, 1)
+                            verts = funcMultiplier(verts, rotated_matrix)
+                            VisualisatorOfTheVector(verts)
+
+                        case "2":
+                            scale = float(input("Enter the scale factor: "))
+                            scale_matrix = np.array([[scale, 0], [0, scale]])
+                            verts = funcMultiplier(verts, scale_matrix)
+                            VisualisatorOfTheVector(verts)
+
+                        case "3":
+                            axis = input("Enter the axis of mirroring (x or y): ")
+                            if axis == 'x':
+                                mirror_matrix = np.array([[-1, 0], [0, 1]])
+                            elif axis == 'y':
+                                mirror_matrix = np.array([[1, 0], [0, -1]])
+                            verts = funcMultiplier(verts, mirror_matrix)
+                            VisualisatorOfTheVector(verts)
+
+                        case "4":
+                            axis = input("Enter the axis to tilt (x or y): ")
+                            tilt_angle = float(input("Enter the tilt angle: "))
+
+                            if axis == 'x':
+                                tilt_matrix = np.array([[cos(tilt_angle), sin(tilt_angle)], [sin(tilt_angle), cos(tilt_angle)]])
+                            elif axis == 'y':
+                                tilt_matrix = np.array([[cos(tilt_angle), -sin(tilt_angle)], [sin(tilt_angle), cos(tilt_angle)]])
+                            verts = funcMultiplier(verts, tilt_matrix)
+                            VisualisatorOfTheVector(verts)
+
+                        case "5":
+                            matrix = np.array([[float(input("Enter the a coefficient: ")), float(input("Enter the b coefficient: "))],
+                                               [float(input("Enter the c coefficient: ")), float(input("Enter the d coefficient: "))]])
+                            verts = funcMultiplier(verts, matrix)
+                            VisualisatorOfTheVector(verts)
+                        case '6':
+                            break
+
+            case '7':
+                img = cv.imread("image.jpg")
+                img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+                plt.imshow(img)
+                plt.show()
+                time.sleep(3)
+
+                # Get the image shape
+                (h, w) = img.shape[:2]
+
+                # Define the center of the image
+                center = (w / 2, h / 2)
+
+                # Define the angle of rotation
+                angle = 45  # Rotate the image by 45 degrees
+
+                # Get the rotation matrix
+                M = cv.getRotationMatrix2D(center, angle, 1.0)
+
+                # Perform the rotation
+                rotated = cv.warpAffine(img, M, (w, h))
+
+                # Display the rotated image
+                img2 = cv.cvtColor(rotated, cv.COLOR_BGR2RGB)
+                plt.imshow(img2)
+                plt.show()
+
+                # # Display the rotated image
+                # cv.imshow('Rotated Image', rotated)
+                # cv.waitKey(0)
+                # cv.destroyAllWindows()
+
+                time.sleep(3)
+
+                # Load the image
+                img = cv.imread('image.jpg')
+
+                # Get the image shape
+                (h, w) = img.shape[:2]
+
+                # Define the new width
+                new_w = w // 2
+
+                # Resize the image
+                resized = cv.resize(img, (new_w, h))
+
+                # Display the resized image
+                img2 = cv.cvtColor(resized, cv.COLOR_BGR2RGB)
+                plt.imshow(img2)
+                plt.show()
 
             case _:
                 print("Incorrect operation number.")
