@@ -5,10 +5,6 @@ import time
 
 
 def rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    """
     axis = np.asarray(axis)
     axis = axis / np.sqrt(np.dot(axis, axis))
     a = np.cos(theta / 2.0)
@@ -34,9 +30,6 @@ def mirror_by_x(x, y, z):
     return mirrored_x, mirrored_y, mirrored_z
 
 
-# Your original vertices
-verts = [(0, 0, 0), (1, 0, 0), (2, 2, 1), (3, 0, 0), (4, 0, 0), (0, 0, 0)]
-
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
@@ -56,8 +49,8 @@ time.sleep(3)
 
 x, y, z = mirror_by_x(x, y, z)
 
-fig2 = plt.figure()  # create a new figure
-ax2 = fig2.add_subplot(111, projection='3d')  # create a new 3D subplot
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(111, projection='3d')
 
 ax2.plot3D(x, y, z, c='r', marker='o')
 
